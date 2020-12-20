@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 1 = very low clearance/classification level, >1 = higher clearance/classification level -->
+<Policy 
+    xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="urn:oasis:names:tc:xacml:2.0:policy:schema:os 
+      http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd" 
+    PolicyId="urn:xacml:2.0:interop:example:policyid:blp" 
+    RuleCombiningAlgId=
+      "urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides">
+  <Description>
+    BLP policy
+  </Description>
+  <Target/>
+  <Rule RuleId="ss" 
+      Effect="Deny">
+    <Description>
+      No read up (simple security property)
+    </Description>
+    <Target>
+      <Actions>
+        <Action>
+          <ActionMatch
+              MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+            <AttributeValue
+                DataType="http://www.w3.org/2001/XMLSchema#string"
+                  >read</AttributeValue>
+            <ActionAttributeDesignator
+                AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                DataType="http://www.w3.org/2001/XMLSchema#string"/>
+          </ActionMatch>
+        </Action>
+      </Actions>
+    </Target>
+    <Condition>
+    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-less-than">
+    	<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-one-and-only">
+    	<SubjectAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#integer" AttributeId="sub-clearance"/>
+    	</Apply>
+    	<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-one-and-only">
+    	<ResourceAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#integer" AttributeId="res-classification"/>
+        </Apply>    
+    </Apply>
+    </Condition>
+  </Rule>
+  <Rule RuleId="star" 
+      Effect="Deny">
+    <Description>
+      No write down (*-property)
+    </Description>
+    <Target>
+      <Actions>
+        <Action>
+          <ActionMatch
+              MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+            <AttributeValue
+                DataType="http://www.w3.org/2001/XMLSchema#string"
+                  >write</AttributeValue>
+            <ActionAttributeDesignator
+                AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                DataType="http://www.w3.org/2001/XMLSchema#string"/>
+          </ActionMatch>
+        </Action>
+      </Actions>
+    </Target>
+    <Condition>
+    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-greater-than">
+    	<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-one-and-only">
+    	<SubjectAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#integer" AttributeId="sub-classification"/>
+    	</Apply>
+    	<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-one-and-only">
+    	<ResourceAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#integer" AttributeId="res-classification"/>
+        </Apply>    
+    </Apply>
+    </Condition>
+  </Rule>
+  <Rule RuleId="ds" Effect="Deny">
+  	<Description>DS-property (very simplified, I assume that permission has been looked up in the ACM before 
+  	the request is sent. AttributeValue can thus be true or false)</Description>
+  	<Target>
+  	<Environments>
+  		<Environment>
+  		<EnvironmentMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:boolean-equal">
+  		<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#boolean">false</AttributeValue>
+  		<EnvironmentAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#boolean" AttributeId="is-in-acm"/>
+  		</EnvironmentMatch>
+  		</Environment>
+  	</Environments>
+  	</Target>
+  </Rule>
+  <Rule Effect="Permit" RuleId="permit">
+  </Rule>
+</Policy>
